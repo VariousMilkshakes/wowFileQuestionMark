@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 // Contact to send files to
@@ -11,10 +13,11 @@ type Contact struct {
 	Name     string `json:"name"`
 	ExPhrase string `json:"exchangePhrase"`
 	Address  string `json:"ipAddress"`
+	Port     string `json:"port"`
 }
 
 // ReadContacts reads contact files
-func ReadContacts() []Contact {
+func ReadContacts() ContactList {
 	content, err := ioutil.ReadFile("contacts.json")
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -22,19 +25,22 @@ func ReadContacts() []Contact {
 
 	var contacts []Contact
 	json.Unmarshal(content, &contacts)
-	fmt.Println(contacts)
 
-	return contacts
+	var newList ContactList
+	newList = newList.Create(contacts)
+
+	return newList
 }
 
-// SaveContacts saves contacts to file
-func SaveContacts(contactList []Contact) {
-	contactList[0].Name = "simon"
+// ManageContacts handles contacts
+func ManageContacts() {
+	contacts := ReadContacts()
+	contacts.DisplayContacts()
 
-	output, _ := json.Marshal(contactList)
-	err := ioutil.WriteFile("contacts.json", output, 0755)
-	if err != nil {
-		fmt.Println(err)
-	}
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("(a) Add, (r) Remove or (c) Change Contacts?")
+	choice, _ := reader.ReadString('\n')
+	choice = CleanInput(choice)
 
+	contacts.ContactChoices(choice)
 }
