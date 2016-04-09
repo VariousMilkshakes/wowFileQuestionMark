@@ -32,24 +32,27 @@ func Start() {
 		reader := bufio.NewReader(os.Stdin)
 
 		// Read settings from file
-		// settings := exchange.ReadPhrase()
-		// fmt.Println(settings["Exchange_String"])
+		settings := exchange.ReadPhrase()
+		fmt.Println(settings["Exchange_String"])
 
 		fmt.Println("(s) Sending, (r) Receiving or (m) Manage Contacts?")
 		choice, _ := reader.ReadString('\n')
 		choice = easyInput.CleanInput(choice)
 
-		handleUserChoices(choice)
+		handleUserChoices(choice, settings)
 	}
 
 }
 
-func handleUserChoices(choice string) {
+func handleUserChoices(choice string, settings map[string]string) {
 
 	switch choice {
 	case "s":
 		fmt.Println("Sending File")
-		// exchange.PrepareSending()
+		fmt.Println("What file?")
+		filePath, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		settings["filePath"] = easyInput.CleanInput(filePath)
+		exchange.PrepareSending(settings)
 		break
 
 	case "r":

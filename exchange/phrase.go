@@ -10,7 +10,7 @@ import (
 var Settings map[string]string
 
 // ReadPhrase reads contact files
-func ReadPhrase() {
+func ReadPhrase() map[string]string {
 	input, err := ioutil.ReadFile("settings.ini")
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -28,6 +28,8 @@ func ReadPhrase() {
 			Settings[setting[0]] = setting[1]
 		}
 	}
+
+	return Settings
 }
 
 func checkForSetting(line string) bool { // Change to boolean result<<<<<<<<

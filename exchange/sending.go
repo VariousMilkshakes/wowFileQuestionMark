@@ -7,17 +7,18 @@ import (
 	"net"
 
 	"github.com/variousmilkshakes/wowFileQuestionMark/contacts"
+	"github.com/variousmilkshakes/wowFileQuestionMark/easyInput"
+	"github.com/variousmilkshakes/wowFileQuestionMark/goT"
 )
 
 // PrepareSending gathers contact and file
 func PrepareSending(settings map[string]string) {
 
 	// Catch send finish
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println(r)
-		}
-	}()
+	defer goT.Rp()
+
+	file, err := easyInput.OpenFile(settings["filePath"])
+	goT.Cep(err)
 
 	// Ask for target contact
 	target := contacts.ContactQuery("Send File To")
@@ -45,13 +46,19 @@ func PrepareSending(settings map[string]string) {
 				cl.SaveContacts()
 
 				// Start sending file to peer
-				filePath := ""
-				SendToPeer(cp, filePath)
+				SendToPeer(cp, file)
 
 			}
 
 		}
 
+	} else {
+		fmt.Println("Skipping Validation")
+
+		// Already paired with peer
+		cp := ConnectToPeer(peer)
+
+		SendToPeer(cp, file)
 	}
 
 }
@@ -89,10 +96,17 @@ func ValidatePeer(peer *contacts.Contact, conn net.Conn) (*contacts.Contact, err
 }
 
 // SendToPeer send data to peer
-func SendToPeer(conn net.Conn, path string) {
+func SendToPeer(conn net.Conn, file easyInput.File) {
 	fmt.Fprintln(conn, "test")
+
+	com := bufio.NewReader(conn)
+	check, err := com.ReadString('\n')
+	if easyInput.CleanInput(check) != "ok" || err != nil {
+		panic("Connection Refused")
+	}
+
 	fmt.Println("Sending Data ...")
-	fmt.Fprintln(conn, "cool.txt")
-	fmt.Fprintln(conn, []byte("hello world!"))
+	fmt.Fprintln(conn, file.FileName)
+	fmt.Fprintln(conn, file.Bytes)
 	panic("Finished Sending")
 }

@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"strings"
+
+	"github.com/variousmilkshakes/wowFileQuestionMark/easyInput"
 )
 
 const (
@@ -40,6 +42,12 @@ func StartListening() {
 
 // ValidateConnection between clients
 func ValidateConnection(connection net.Conn) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
+
 	fmt.Println("Phrase")
 	exchange, _ := bufio.NewReader(connection).ReadString('\n')
 	exchangeString := cleanInput(string(exchange))
@@ -47,6 +55,8 @@ func ValidateConnection(connection net.Conn) {
 
 	if "test" == exchangeString {
 		fmt.Println("Paired")
+
+		fmt.Fprintln(connection, "ok")
 		receiveData(connection)
 	} else {
 		newClient(connection)
@@ -64,6 +74,16 @@ func receiveData(connection net.Conn) {
 
 	fileData, _ := com.ReadBytes('\n')
 	fmt.Println(fileData)
+
+	newFile := easyInput.File{
+		fileData,
+		string(fileData),
+		fileName,
+		"/",
+	}
+
+	newFile.WriteFile()
+
 	fmt.Fprintln(connection, "done")
 	panic("Finished Connection")
 }
