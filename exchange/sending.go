@@ -58,15 +58,18 @@ func PrepareSending(settings map[string]string) {
 		// Already paired with peer
 		cp := ConnectToPeer(peer)
 
-		SendToPeer(cp, file)
+		for {
+			SendToPeer(cp, file)
+		}
 	}
 
 }
 
 // ConnectToPeer establishs connection with peer
 func ConnectToPeer(peer *contacts.Contact) net.Conn {
-	// fullAddr := fmt.Sprintf("%s:%s", peer.Address, peer.Port)
-	conn, err := net.Dial("tcp", "192.168.0.26:7654")
+	fullAddr := fmt.Sprintf("%s:%s", peer.Address, peer.Port)
+	fmt.Println(fullAddr)
+	conn, err := net.Dial("tcp", fullAddr)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -107,6 +110,7 @@ func SendToPeer(conn net.Conn, file easyInput.File) {
 
 	fmt.Println("Sending Data ...")
 	fmt.Fprintln(conn, file.FileName)
-	fmt.Fprintln(conn, file.Bytes)
+	fmt.Println(file.PlainText)
+	fmt.Fprintln(conn, file.PlainText)
 	panic("Finished Sending")
 }

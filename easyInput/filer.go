@@ -19,16 +19,21 @@ type File struct {
 
 // WriteFile writes file
 func (file *File) WriteFile() {
+	// fmt.Println(file)
 	newFile, err := os.Create(file.FileName)
-	goT.Cep(err)
-
-	rep, err := newFile.Write(file.Bytes)
-	goT.Cep(err)
-
-	fmt.Println("Saved file ", file.FileName)
-	fmt.Println(rep)
 
 	defer newFile.Close()
+
+	goT.Cep(err)
+
+	_, err = newFile.WriteString(file.PlainText)
+	goT.Cep(err)
+
+	newFile.Sync()
+
+	fmt.Println("Saved file ", file.FileName)
+	// fmt.Println(rep)
+
 }
 
 // OpenFile returns file struct
@@ -44,8 +49,6 @@ func OpenFile(filePath string) (f File, err error) {
 		filePath,
 		string(contents),
 	}
-
-	fmt.Println(contents)
 
 	return f, err
 }

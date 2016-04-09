@@ -16,13 +16,14 @@ const (
 )
 
 // StartListening begins waiting for files
-func StartListening() {
+func StartListening(settings map[string]string) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
 		}
 	}()
 
+	fmt.Println(settings["Port"])
 	ln, err := net.Listen("tcp", ":7654")
 
 	if err != nil {
@@ -72,14 +73,14 @@ func receiveData(connection net.Conn) {
 	fileName = cleanInput(fileName)
 	fmt.Println(string(fileName))
 
-	fileData, _ := com.ReadBytes('\n')
-	fmt.Println(fileData)
+	fileData, _ := com.ReadString('\n')
+	// fmt.Println(fileData)
 
 	newFile := easyInput.File{
-		fileData,
-		string(fileData),
+		[]byte(fileData),
 		fileName,
 		"/",
+		fileData,
 	}
 
 	newFile.WriteFile()

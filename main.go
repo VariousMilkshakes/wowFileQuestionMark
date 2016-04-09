@@ -57,7 +57,7 @@ func handleUserChoices(choice string, settings map[string]string) {
 
 	case "r":
 		fmt.Println("Waiting to Receive File")
-		exchange.StartListening()
+		exchange.StartListening(settings)
 		break
 
 	case "m":

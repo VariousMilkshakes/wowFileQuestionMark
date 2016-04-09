@@ -26,6 +26,7 @@ func ReadPhrase() map[string]string {
 		if checkForSetting(line) {
 			setting := strings.Split(line, "=")
 			Settings[setting[0]] = setting[1]
+			fmt.Printf("%s=%s", setting[0], setting[1])
 		}
 	}
 
