@@ -10,28 +10,48 @@ import (
 )
 
 // PrepareSending gathers contact and file
-func PrepareSending() {
+func PrepareSending(settings map[string]string) {
+
+	// Catch send finish
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println(r)
 		}
 	}()
 
+	// Ask for target contact
 	target := contacts.ContactQuery("Send File To")
+
+	// Get correct contact from all contacts
 	cl := contacts.ReadContacts()
 	peer := cl.FindContact(target)
 
+	// Are you paired with peer
 	if peer.ExPhrase == "EXCHANGE" {
+
 		fmt.Println("Validating Connection with Peer")
+
 		cp := ConnectToPeer(peer)
 		for {
-			err := ValidatePeer(peer, cp)
+
+			// Start pairing process
+			p, err := ValidatePeer(peer, cp)
+
+			// If pair completes
 			if err == nil {
-				fmt.Println(cl)
+
+				// Save exchange phrase to cl
+				cl.UpdateContact(p)
 				cl.SaveContacts()
-				SendToPeer(cp)
+
+				// Start sending file to peer
+				filePath := ""
+				SendToPeer(cp, filePath)
+
 			}
+
 		}
+
 	}
 
 }
@@ -48,7 +68,7 @@ func ConnectToPeer(peer *contacts.Contact) net.Conn {
 }
 
 // ValidatePeer checks with peer if connection is accepted
-func ValidatePeer(peer *contacts.Contact, conn net.Conn) error {
+func ValidatePeer(peer *contacts.Contact, conn net.Conn) (*contacts.Contact, error) {
 	com := bufio.NewReader(conn)
 
 	fmt.Fprintln(conn, "pair")
@@ -62,14 +82,14 @@ func ValidatePeer(peer *contacts.Contact, conn net.Conn) error {
 		fmt.Println(phrase)
 		fmt.Println("PAIRED")
 		peer.ExPhrase = phrase
-		return nil
+		return peer, nil
 	}
 
-	return errors.New("Connection Refused")
+	return peer, errors.New("Connection Refused")
 }
 
 // SendToPeer send data to peer
-func SendToPeer(conn net.Conn) {
+func SendToPeer(conn net.Conn, path string) {
 	fmt.Fprintln(conn, "test")
 	fmt.Println("Sending Data ...")
 	fmt.Fprintln(conn, "cool.txt")

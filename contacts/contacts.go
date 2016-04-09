@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
+
+	"github.com/variousmilkshakes/wowFileQuestionMark/easyInput"
 )
 
 // Contact to send files to
@@ -41,7 +42,7 @@ func ManageContacts() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("(a) Add, (r) Remove or (c) Change Contacts?")
 	choice, _ := reader.ReadString('\n')
-	choice = cleanInput(choice)
+	choice = easyInput.CleanInput(choice)
 
 	contacts.ContactChoices(choice)
 }
@@ -51,7 +52,7 @@ func ContactQuery(qString string) string {
 	r := bufio.NewReader(os.Stdin)
 	fmt.Printf("What contact would you like to %s?\n", qString)
 	choice, _ := r.ReadString('\n')
-	return cleanInput(choice)
+	return easyInput.CleanInput(choice)
 }
 
 // BuildContact makes a contact from user input
@@ -59,13 +60,13 @@ func BuildContact() Contact {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Name :")
 	name, _ := reader.ReadString('\n')
-	name = cleanInput(name)
+	name = easyInput.CleanInput(name)
 	fmt.Println("IP Address :")
 	IP, _ := reader.ReadString('\n')
-	IP = cleanInput(IP)
+	IP = easyInput.CleanInput(IP)
 	fmt.Println("Port :")
 	port, _ := reader.ReadString('\n')
-	port = cleanInput(port)
+	port = easyInput.CleanInput(port)
 
 	return Contact{
 		Name:     name,
@@ -73,10 +74,4 @@ func BuildContact() Contact {
 		Port:     port,
 		ExPhrase: "EXCHANGE",
 	}
-}
-
-func cleanInput(raw string) (output string) {
-	_ = "breakpoint"
-	output = strings.TrimSpace(raw)
-	return output
 }

@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/variousmilkshakes/wowFileQuestionMark/easyInput"
 )
 
 // ContactList holds contacts
@@ -113,6 +115,18 @@ func (cl ContactList) FindContact(targetName string) *Contact {
 	panic("No Contact Found!")
 }
 
+// UpdateContact finds and replaces contact with new one
+func (cl ContactList) UpdateContact(nC *Contact) {
+	for indx, contact := range cl.directory {
+		if contact.Name == nC.Name {
+			cl.directory[indx].Address = nC.Address
+			cl.directory[indx].ExPhrase = nC.ExPhrase
+			cl.directory[indx].Name = nC.Name
+			cl.directory[indx].Port = nC.Port
+		}
+	}
+}
+
 // ModifyContact changes details of a contact
 func (cl ContactList) ModifyContact(targetName string) {
 	defer func() {
@@ -148,7 +162,7 @@ func modQuestion(catagory string) (string, error) {
 	fmt.Printf("Change %s (leave blank to not change): \n", catagory)
 
 	input, _ := reader.ReadString('\n')
-	if input = cleanInput(input); input != "" {
+	if input = easyInput.CleanInput(input); input != "" {
 		return input, nil
 	}
 
