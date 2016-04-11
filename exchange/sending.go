@@ -110,7 +110,6 @@ func SendToPeer(conn net.Conn, file easyInput.File) {
 
 	fmt.Println("Sending Data ...")
 	fmt.Fprintln(conn, file.FileName)
-	fmt.Println(file.PlainText)
 	fmt.Fprintln(conn, file.PlainText)
 	panic("Finished Sending")
 }
